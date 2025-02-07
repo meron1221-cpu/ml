@@ -3,71 +3,37 @@ import axios from "axios";
 import "./styles.css";
 
 function App() {
-  const [age, setAge] = useState("");
-  const [sex, setSex] = useState("");
-  const [chestPain, setChestPain] = useState("");
-  const [bp, setBp] = useState("");
-  const [cholesterol, setCholesterol] = useState("");
-  const [fbs, setFbs] = useState("");
-  const [ekg, setEkg] = useState("");
-  const [maxHr, setMaxHr] = useState("");
-  const [stDepression, setStDepression] = useState("");
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [formdata, setformData] = useState({
     age: null,
     sex: null,
+    chestPain: null,
+    bp: null,
+    cholesterol: null,
+    fbs: null,
+    ekg: null,
+    maxHr: null,
+    stDepression: null,
   });
 
   function handlechange(e) {
     const { value, name } = e.target;
-    console.log(e.target);
+
     setformData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: Number(value),
     }));
   }
-
-  // Validate form fields
-  const validateForm = () => {
-    const newErrors = {};
-    if (!age) newErrors.age = "Age is required.";
-    if (!sex) newErrors.sex = "Sex is required.";
-    if (!chestPain) newErrors.chestPain = "Chest Pain Type is required.";
-    if (!bp) newErrors.bp = "Blood Pressure is required.";
-    if (!cholesterol) newErrors.cholesterol = "Cholesterol is required.";
-    if (!fbs) newErrors.fbs = "Fasting Blood Sugar is required.";
-    if (!ekg) newErrors.ekg = "EKG Results are required.";
-    if (!maxHr) newErrors.maxHr = "Max Heart Rate is required.";
-    if (!stDepression) newErrors.stDepression = "ST Depression is required.";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if no errors
-  };
 
   // Handle form submission
   const fetchPrediction = async (e) => {
     e.preventDefault();
-
-    // Validate form before submitting
-    if (!validateForm()) {
-      console.log("Form validation failed");
-      return;
-    }
-
-    const numericForm = {
-      age: Number(age),
-      sex: Number(sex),
-      chestPain: Number(chestPain),
-      bp: Number(bp),
-      cholesterol: Number(cholesterol),
-      fbs: Number(fbs),
-      ekg: Number(ekg),
-      maxHr: Number(maxHr),
-      stDepression: Number(stDepression),
-    };
+    const numericForm = Object.fromEntries(
+      Object.entries(formdata).map(([key, value]) => [key, Number(value)])
+    );
 
     setLoading(true);
     setShowToast(true);
@@ -90,17 +56,18 @@ function App() {
 
   // Reset form fields
   const resetForm = () => {
-    setAge("");
-    setSex("");
-    setChestPain("");
-    setBp("");
-    setCholesterol("");
-    setFbs("");
-    setEkg("");
-    setMaxHr("");
-    setStDepression("");
-    setPrediction(null);
-    setErrors({});
+    setformData((prev) => ({
+      ...prev,
+      age: "",
+      sex: "",
+      chestPain: "",
+      bp: "",
+      cholesterol: "null",
+      fbs: "",
+      ekg: "",
+      maxHr: "",
+      stDepression: "",
+    }));
   };
 
   // Render the active section
@@ -122,112 +89,143 @@ function App() {
                     name="age"
                     onChange={handlechange}
                     min="1"
+                    required
                   />
-                  {errors.age && <span className="error">{errors.age}</span>}
                 </div>
                 <div>
                   <label>Sex</label>
                   <select
-                    value={sex}
-                    onChange={(e) => setSex(e.target.value)}
+                    value={formdata.sex}
+                    onChange={handlechange}
+                    name="sex"
                     required
                   >
-                    <option value="">Select</option>
-                    <option value="1" name="male">
+                    <option value="" name="sex">
+                      Select
+                    </option>
+                    <option value="1" name="sex">
                       Male
                     </option>
-                    <option value="0" name="female">
+                    <option value="0" name="sex">
                       Female
                     </option>
                   </select>
-                  {errors.sex && <span className="error">{errors.sex}</span>}
                 </div>
                 <div>
                   <label>Chest Pain Type</label>
                   <select
-                    value={chestPain}
-                    onChange={(e) => setChestPain(e.target.value)}
+                    value={formdata.chestPain}
+                    onChange={handlechange}
+                    name="chestPain"
+                    required
                   >
-                    <option value="">Select</option>
-                    <option value="1">Type 1</option>
-                    <option value="2">Type 2</option>
-                    <option value="3">Type 3</option>
-                    <option value="4">Type 4</option>
+                    <option value="" name="chestPain">
+                      Select
+                    </option>
+                    <option value="1" name="chestPain">
+                      Type 1
+                    </option>
+                    <option value="2" name="chestPain">
+                      Type 2
+                    </option>
+                    <option value="3" name="chestPain">
+                      Type 3
+                    </option>
+                    <option value="4" name="chestPain">
+                      Type 4
+                    </option>
                   </select>
-                  {errors.chestPain && (
-                    <span className="error">{errors.chestPain}</span>
-                  )}
                 </div>
                 <div>
                   <label>Blood Pressure (mm Hg)</label>
                   <input
                     type="number"
                     placeholder="Enter blood pressure"
-                    value={bp}
-                    onChange={(e) => setBp(e.target.value)}
+                    value={formdata.bp}
+                    name="bp"
+                    onChange={handlechange}
                     min="0"
+                    required
                   />
-                  {errors.bp && <span className="error">{errors.bp}</span>}
                 </div>
                 <div>
                   <label>Cholesterol (mg/dl)</label>
                   <input
                     type="number"
                     placeholder="Enter cholesterol level"
-                    value={cholesterol}
-                    onChange={(e) => setCholesterol(e.target.value)}
+                    value={formdata.cholesterol}
+                    name="cholesterol"
+                    onChange={handlechange}
                     min="0"
+                    required
                   />
-                  {errors.cholesterol && (
-                    <span className="error">{errors.cholesterol}</span>
-                  )}
                 </div>
                 <div>
                   <label>Fasting Blood Sugar &gt; 120 mg/dl</label>
-                  <select value={fbs} onChange={(e) => setFbs(e.target.value)}>
-                    <option value="">Select</option>
-                    <option value="1">True</option>
-                    <option value="0">False</option>
+                  <select
+                    value={formdata.fbs}
+                    onChange={handlechange}
+                    name="fbs"
+                    required
+                  >
+                    <option value="" name="fbs">
+                      Select
+                    </option>
+                    <option value="1" name="fbs">
+                      True
+                    </option>
+                    <option value="0" name="fbs">
+                      False
+                    </option>
                   </select>
-                  {errors.fbs && <span className="error">{errors.fbs}</span>}
                 </div>
 
                 {/* Column 2 */}
                 <div>
                   <label>EKG Results</label>
-                  <select value={ekg} onChange={(e) => setEkg(e.target.value)}>
-                    <option value="">Select</option>
-                    <option value="0">Normal</option>
-                    <option value="1">Abnormal</option>
-                    <option value="2">Other</option>
+                  <select
+                    value={formdata.ekg}
+                    onChange={handlechange}
+                    name="ekg"
+                    required
+                  >
+                    <option value="" name="ekg">
+                      Select
+                    </option>
+                    <option value="0" name="ekg">
+                      Normal
+                    </option>
+                    <option value="1" name="ekg">
+                      Abnormal
+                    </option>
+                    <option value="2" name="ekg">
+                      Other
+                    </option>
                   </select>
-                  {errors.ekg && <span className="error">{errors.ekg}</span>}
                 </div>
                 <div>
                   <label>Max Heart Rate</label>
                   <input
                     type="number"
                     placeholder="Enter max heart rate"
-                    value={maxHr}
-                    onChange={(e) => setMaxHr(e.target.value)}
+                    value={formdata.maxHr}
+                    name="maxHr"
+                    onChange={handlechange}
                     min="0"
+                    required
                   />
-                  {errors.maxHr && (
-                    <span className="error">{errors.maxHr}</span>
-                  )}
                 </div>
                 <div>
                   <label>ST Depression</label>
                   <input
                     type="number"
                     placeholder="Enter ST depression"
-                    value={stDepression}
-                    onChange={(e) => setStDepression(e.target.value)}
+                    value={formdata.stDepression}
+                    onChange={handlechange}
+                    name="stDepression"
                     min="0"
+                    required
                   />
-                  {errors.stDepression && (
-                    <span className="error">{errors.stDepression}</span>
-                  )}
                 </div>
               </div>
 
@@ -260,6 +258,7 @@ function App() {
             )}
           </div>
         );
+
       case "about":
         return (
           <div className="about-section">
